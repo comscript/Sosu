@@ -8,6 +8,6 @@ public abstract class Sosuent{
 
 	public Sosuent(){
 		//Automatically binds functions defined in entity to proper keys
-		SosuKey.getInstance().bindEntity(this);
+		Sosutu.get().bindEntity(this);
 	}
 }

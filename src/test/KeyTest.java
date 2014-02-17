@@ -1,10 +1,9 @@
 package test;
 
-import sosutu.SosuKey;
 import sosutu.Sosuent;
+import sosutu.Sosutu;
 
 import org.lwjgl.LWJGLException;
-import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 
 public class KeyTest extends Sosuent{
@@ -26,19 +25,14 @@ public class KeyTest extends Sosuent{
 	}
 
 	public static void main(String [] argv){
-		try {
-			Display.create();
-		} catch (LWJGLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		
+		for (String[] binding:bindings){
+			Sosutu.get().addBinding(binding[0], binding[1]);
 		}
-		SosuKey.init(bindings);
-
 		KeyTest test = new KeyTest();
-
 		while(true){
 
-			SosuKey.getInstance().checkKeys();
+			Sosutu.get().checkKeys();
 			Display.update();
 			try{
 				Thread.sleep(100);

@@ -35,7 +35,7 @@ public class KeyTest extends Sosuent{
 			Sosutu.get().checkKeys();
 			Display.update();
 			try{
-				Thread.sleep(100);
+				Thread.sleep(10);
 			}catch (Exception e){}
 		}
 	}

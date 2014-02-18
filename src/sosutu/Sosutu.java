@@ -1,5 +1,7 @@
 package sosutu;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,7 +38,7 @@ public class Sosutu {
 	//Maps function name to game objects
 	//TODO: be able to map a function to multiple entities (if desired; wasn't
 	//      sure if we were planning on doing this or not
-	private HashMap<String, Sosuent> functionEnts = new HashMap<String, Sosuent>();
+	private HashMap<String, MethodHandle> functionEnts = new HashMap<String, MethodHandle>();
 	
 	//Automatically create an 800x600 OpenGL 3.2 window.
 	//A more robust system will be implemented later.
@@ -113,10 +115,17 @@ public class Sosutu {
 	 * @param entity
 	 */
 	public void bindEntity(Sosuent entity){
+		MethodHandles.Lookup lookup = MethodHandles.lookup();
 		Method[] methods = entity.getClass().getMethods();
+		//TODO: Determine if there's a faster way to get the method handle
 		for (Method m: methods){
 			if (functions.contains(m.getName())){
-				functionEnts.put(m.getName(), entity);
+				try{
+					functionEnts.put(m.getName(), lookup.unreflect(m).bindTo(entity));
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+				
 			}
 		}
 	}
@@ -127,11 +136,10 @@ public class Sosutu {
 		while (Keyboard.next()){
 			function = bindings.get(Keyboard.getEventKey());
 			if (function != null){
-				Sosuent entity = functionEnts.get(function);
+				MethodHandle handle = functionEnts.get(function);
 				try{
-					entity.getClass().getMethod(function, new Class[]{})
-					.invoke(entity, new Object[]{});
-				}catch (Exception e){
+					handle.invoke();
+				}catch (Throwable e){
 					e.printStackTrace();
 					//TODO: determine whether there are any possible exceptions we need to worry about
 				}

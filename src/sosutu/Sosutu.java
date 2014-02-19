@@ -3,6 +3,7 @@ package sosutu;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -28,17 +29,13 @@ public class Sosutu {
 	private World world = null;
 	
 	//Maps key to function name
-	private HashMap<Integer, String>  bindings = new HashMap<Integer, String>();
+	private HashMap<Integer, String[]>  bindings = new HashMap<Integer, String[]>();
 
 	//Keeps track of functions that have bindings
-	//TODO: if we decide functions can map to multiple entities, we'll
-	//      need to keep track of how many entities are bound as well
 	private HashSet<String> functions = new HashSet<String>();
 
 	//Maps function name to game objects
-	//TODO: be able to map a function to multiple entities (if desired; wasn't
-	//      sure if we were planning on doing this or not
-	private HashMap<String, MethodHandle> functionEnts = new HashMap<String, MethodHandle>();
+	private HashMap<String, ArrayList<MethodHandle>> functionEnts = new HashMap<String, ArrayList<MethodHandle>>();
 	
 	//Automatically create an 800x600 OpenGL 3.2 window.
 	//A more robust system will be implemented later.
@@ -105,8 +102,9 @@ public class Sosutu {
 		}
 	}
 	
-	public void addBinding(String key, String function){
-		bindings.put(Keyboard.getKeyIndex(key), function);
+	public void addBinding(String key, String function, String type){
+		String [] newBinding = {function, type};
+		bindings.put(Keyboard.getKeyIndex(key), newBinding);
 		functions.add(function);
 	}
 	/**
@@ -121,7 +119,14 @@ public class Sosutu {
 		for (Method m: methods){
 			if (functions.contains(m.getName())){
 				try{
-					functionEnts.put(m.getName(), lookup.unreflect(m).bindTo(entity));
+					MethodHandle handle = lookup.unreflect(m).bindTo(entity);
+					if (functionEnts.get(m.getName()) == null){
+						ArrayList<MethodHandle> newList = new ArrayList<MethodHandle>();
+						newList.add(handle);
+						functionEnts.put(m.getName(), newList);
+					}else{
+						functionEnts.get(m.getName()).add(handle);
+					}
 				}catch(Exception e){
 					e.printStackTrace();
 				}
@@ -129,19 +134,23 @@ public class Sosutu {
 			}
 		}
 	}
-	//TODO: allow bindings to be changed dynamically (e.g. in controls menu)
 
 	public void checkKeys(){
 		String function;
+		String type;
 		while (Keyboard.next()){
-			function = bindings.get(Keyboard.getEventKey());
-			if (function != null){
-				MethodHandle handle = functionEnts.get(function);
-				try{
-					handle.invoke();
-				}catch (Throwable e){
-					e.printStackTrace();
-					//TODO: determine whether there are any possible exceptions we need to worry about
+			function = bindings.get(Keyboard.getEventKey())[0];
+			type = bindings.get(Keyboard.getEventKey())[1];
+			boolean keyState = Keyboard.getEventKeyState();
+			boolean typeMatch = ((type.equals("down") && keyState)||(type.equals("up") && !keyState));
+			if ((function != null) && typeMatch){
+				for (MethodHandle handle:functionEnts.get(function)){
+					try{
+						handle.invoke();
+					}catch (Throwable e){
+						e.printStackTrace();
+						//TODO: determine whether there are any possible exceptions we need to worry about
+					}
 				}
 			}
 		}

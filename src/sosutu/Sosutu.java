@@ -41,15 +41,14 @@ public class Sosutu {
 	//A more robust system will be implemented later.
 	private Sosutu(){
 		try {
-			/*
+			
 			PixelFormat pixelFormat = new PixelFormat();
 			ContextAttribs context = new ContextAttribs(3,2)
 				.withForwardCompatible(true)
 				.withProfileCore(true);
 			Display.setDisplayMode(new DisplayMode(800,600));
 			Display.create(pixelFormat, context);
-			*/
-			Display.create();
+			
 			//Set up keyboard
 			Keyboard.create();
 		} catch (LWJGLException e) {
@@ -115,7 +114,6 @@ public class Sosutu {
 	public void bindEntity(Sosuent entity){
 		MethodHandles.Lookup lookup = MethodHandles.lookup();
 		Method[] methods = entity.getClass().getMethods();
-		//TODO: Determine if there's a faster way to get the method handle
 		for (Method m: methods){
 			if (functions.contains(m.getName())){
 				try{
@@ -149,7 +147,6 @@ public class Sosutu {
 						handle.invoke();
 					}catch (Throwable e){
 						e.printStackTrace();
-						//TODO: determine whether there are any possible exceptions we need to worry about
 					}
 				}
 			}

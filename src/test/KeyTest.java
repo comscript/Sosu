@@ -2,45 +2,56 @@ package test;
 
 import sosutu.Sosuent;
 import sosutu.Sosutu;
-
-import org.lwjgl.LWJGLException;
-import org.lwjgl.opengl.Display;
+import sosutu.World;
 
 public class KeyTest extends Sosuent{
 
-	private static String[][] bindings = {{"RETURN", "enterPressed", "down"},
-										  {"SPACE", "spacePressed", "down"},
-										  {"E", "ePressed", "up"}};
+	private static String[][] bindings = {{"RETURN", "enterPressed"},
+										  {"SPACE", "spacePressed"},
+										  {"E", "ePressed"},
+										  {"BUTTON0", "leftMouse"},
+										 };
 	public String name;
-	public KeyTest(String name){
-		this.name = name;
+	public KeyTest(){
 	}
-	public void enterPressed(){
-		System.out.println("Enter was pressed for "+name);
+	
+	public void leftMouse(boolean pressed){
+		if(pressed)
+			System.out.println("Left Mouse Button was pressed");
+		else
+			System.out.println("Left Mouse Button was released");
+	}
+	public void enterPressed(boolean pressed){
+		if(pressed)
+			System.out.println("Enter was pressed");
+		else
+			System.out.println("Enter was released");
 	}
 
-	public void spacePressed(){
-		System.out.println("Space was pressed for "+name);
+	public void spacePressed(boolean pressed){
+		if(pressed)
+			System.out.println("Space was pressed");
+		else
+			System.out.println("Space was released");
 	}
 
-	public void ePressed(){
-		System.out.println("E was pressed for "+name);
+	public void ePressed(boolean pressed){
+		if(pressed)
+			System.out.println("E was pressed");
+		else
+			System.out.println("E was released");
 	}
 
 	public static void main(String [] argv){
-		
+		Sosutu sosutu = Sosutu.get();
+		sosutu.init();
+		World testworld = new World();
+		sosutu.setWorld(testworld);
 		for (String[] binding:bindings){
-			Sosutu.get().addBinding(binding[0], binding[1], binding[2]);
+			testworld.addBinding(binding[0], binding[1]);
 		}
-		KeyTest test = new KeyTest("First");
-		KeyTest test2 = new KeyTest("Second");
-		while(true){
-
-			Sosutu.get().checkKeys();
-			Display.update();
-			try{
-				Thread.sleep(10);
-			}catch (Exception e){}
-		}
+		KeyTest test = new KeyTest();
+		sosutu.loop();
+		
 	}
 }

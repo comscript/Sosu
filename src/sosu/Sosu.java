@@ -1,11 +1,4 @@
-package sosutu;
-
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+package sosu;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
@@ -16,12 +9,12 @@ import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.PixelFormat;
 
 /**
- * Sosutu is the core of the soon-to-be wildly popular 
+ * Sosu is the core of the soon-to-be wildly popular 
  * SoulSurvivor video game.
  */
-public class Sosutu {
-	//Only once instance of sosutu should exist.
-	private static Sosutu sosutu = new Sosutu();
+public class Sosu {
+	//Only once instance of sosu should exist.
+	private static Sosu sosu = new Sosu();
 	
 	//Control variables:
 	private boolean running = false;
@@ -30,24 +23,21 @@ public class Sosutu {
 	//Loaded objects:
 	private World world = null;
 	
-	//Automatically create an 800x600 OpenGL 3.2 window.
-	//A more robust system will be implemented later.
-	private Sosutu(){
+	private Sosu(){
 	}
 	
 	/**
-	 * Get the running instance of Sosutu.
-	 * @return Sosutu instance
+	 * Get the instance of Sosu.
+	 * @return Sosu instance
 	 */
-	public static Sosutu get(){
-		return sosutu;
+	public static Sosu get(){
+		return sosu;
 	}
 	
-	public void go(){
-		sosutu.init();
-		sosutu.loop();
-	}
-	
+	/**
+	 * Initialize OpenGL, the display, and input devices. This will cause a window
+	 * to pop up, so be sure to render a splash image if you plan to spend a while loading.
+	 */
 	public void init(){
 		try {
 			//Set up the display for OpenGL 3.2
@@ -74,8 +64,9 @@ public class Sosutu {
 	 * Change the current world.
 	 * @param world
 	 */
-	public void setWorld(World world){
+	public void loadWorld(World world){
 		this.world = world;
+		world.load();
 	}
 	
 	/**
@@ -102,10 +93,10 @@ public class Sosutu {
 	}
 	
 	/**
-	 * Start Sosutu. The currently loaded world will begin to render
+	 * Start Sosu. The currently loaded world will begin to render
 	 * and update. If no world is loaded, this method does nothing.
 	 */
-	public void loop(){
+	public void start(){
 		if(null == this.world){
 			return;
 		}

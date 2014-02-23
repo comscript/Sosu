@@ -1,25 +1,25 @@
-package sosutu;
+package sosu;
 
 /**
  *This class should be the base class of all entities created in the game
  */
 
-public abstract class Sosuent{
+public abstract class Bu{
 	
-	private Sosutu sosutu = null;
+	private Sosu sosu = null;
 	private World world = null;
 
-	public Sosuent(){
-		sosutu = Sosutu.get();
-		world = sosutu.getWorld();
+	public Bu(){
+		sosu = Sosu.get();
+		world = sosu.getWorld();
 		//Automatically binds functions defined in entity to proper keys
-		world.bindEntity(this);
+		world.newBu(this);
 	}
 	
-	public Sosuent(World world){
-		sosutu = Sosutu.get();
+	public Bu(World world){
+		sosu = Sosu.get();
 		this.world = world;
 		//Automatically binds functions defined in entity to proper keys
-		world.bindEntity(this);
+		world.newBu(this);
 	}
 }

@@ -5,9 +5,21 @@ package sosutu;
  */
 
 public abstract class Sosuent{
+	
+	private Sosutu sosutu = null;
+	private World world = null;
 
 	public Sosuent(){
+		sosutu = Sosutu.get();
+		world = sosutu.getWorld();
 		//Automatically binds functions defined in entity to proper keys
-		Sosutu.get().bindEntity(this);
+		world.bindEntity(this);
+	}
+	
+	public Sosuent(World world){
+		sosutu = Sosutu.get();
+		this.world = world;
+		//Automatically binds functions defined in entity to proper keys
+		world.bindEntity(this);
 	}
 }

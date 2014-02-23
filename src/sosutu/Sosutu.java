@@ -9,6 +9,7 @@ import java.util.HashSet;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.ContextAttribs;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
@@ -23,37 +24,15 @@ public class Sosutu {
 	private static Sosutu sosutu = new Sosutu();
 	
 	//Control variables:
+	private boolean running = false;
 	private boolean quitting = false;
 	
 	//Loaded objects:
 	private World world = null;
 	
-	//Maps key to function name
-	private HashMap<Integer, String[]>  bindings = new HashMap<Integer, String[]>();
-
-	//Keeps track of functions that have bindings
-	private HashSet<String> functions = new HashSet<String>();
-
-	//Maps function name to game objects
-	private HashMap<String, ArrayList<MethodHandle>> functionEnts = new HashMap<String, ArrayList<MethodHandle>>();
-	
 	//Automatically create an 800x600 OpenGL 3.2 window.
 	//A more robust system will be implemented later.
 	private Sosutu(){
-		try {
-			
-			PixelFormat pixelFormat = new PixelFormat();
-			ContextAttribs context = new ContextAttribs(3,2)
-				.withForwardCompatible(true)
-				.withProfileCore(true);
-			Display.setDisplayMode(new DisplayMode(800,600));
-			Display.create(pixelFormat, context);
-			
-			//Set up keyboard
-			Keyboard.create();
-		} catch (LWJGLException e) {
-			e.printStackTrace();
-		}
 	}
 	
 	/**
@@ -64,12 +43,47 @@ public class Sosutu {
 		return sosutu;
 	}
 	
+	public void go(){
+		sosutu.init();
+		sosutu.loop();
+	}
+	
+	public void init(){
+		try {
+			//Set up the display for OpenGL 3.2
+			PixelFormat pixelFormat = new PixelFormat();
+			ContextAttribs context = new ContextAttribs(3,2)
+				.withForwardCompatible(true)
+				.withProfileCore(true);
+			Display.setDisplayMode(new DisplayMode(800,600));
+			Display.create(pixelFormat, context);
+			//Set up input devices.
+			Mouse.create();
+			Keyboard.create();
+			//Sosu should now be running.
+			running = true;
+		} catch (LWJGLException e) {
+			/**
+			 * If we can't initialize a display, crash and burn.
+			 */
+			e.printStackTrace();
+		}
+	}
+	
 	/**
 	 * Change the current world.
 	 * @param world
 	 */
-	public void world_change(World world){
+	public void setWorld(World world){
 		this.world = world;
+	}
+	
+	/**
+	 * Get the current world.
+	 * 
+	 */
+	public World getWorld(){
+		return world;
 	}
 	
 	/**
@@ -91,66 +105,23 @@ public class Sosutu {
 	 * Start Sosutu. The currently loaded world will begin to render
 	 * and update. If no world is loaded, this method does nothing.
 	 */
-	public void go(){
+	public void loop(){
 		if(null == this.world){
 			return;
 		}
+		running = true;
 		while(!isQuitting()){
+			world.broadcastInput();
 			world.update();
 			world.render();
+			Display.update();
 		}
+		Keyboard.destroy();
+		Mouse.destroy();
+		Display.destroy();
+		
 	}
 	
-	public void addBinding(String key, String function, String type){
-		String [] newBinding = {function, type};
-		bindings.put(Keyboard.getKeyIndex(key), newBinding);
-		functions.add(function);
-	}
-	/**
-	 * Called whenever an entity is created; keeps track of functions that
-	 * are mapped and which entity they are mapped to.
-	 * @param entity
-	 */
-	public void bindEntity(Sosuent entity){
-		MethodHandles.Lookup lookup = MethodHandles.lookup();
-		Method[] methods = entity.getClass().getMethods();
-		for (Method m: methods){
-			if (functions.contains(m.getName())){
-				try{
-					MethodHandle handle = lookup.unreflect(m).bindTo(entity);
-					if (functionEnts.get(m.getName()) == null){
-						ArrayList<MethodHandle> newList = new ArrayList<MethodHandle>();
-						newList.add(handle);
-						functionEnts.put(m.getName(), newList);
-					}else{
-						functionEnts.get(m.getName()).add(handle);
-					}
-				}catch(Exception e){
-					e.printStackTrace();
-				}
-				
-			}
-		}
-	}
 
-	public void checkKeys(){
-		String function;
-		String type;
-		while (Keyboard.next()){
-			function = bindings.get(Keyboard.getEventKey())[0];
-			type = bindings.get(Keyboard.getEventKey())[1];
-			boolean keyState = Keyboard.getEventKeyState();
-			boolean typeMatch = ((type.equals("down") && keyState)||(type.equals("up") && !keyState));
-			if ((function != null) && typeMatch){
-				for (MethodHandle handle:functionEnts.get(function)){
-					try{
-						handle.invoke();
-					}catch (Throwable e){
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-	}
 
 }

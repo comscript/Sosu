@@ -1,9 +1,9 @@
-package sosutu;
+package sosu;
 
 public class Main {
 
 	public static void main(String[] args) {
-		Sosutu.get();
+		Sosu.get();
 	}
 
 }

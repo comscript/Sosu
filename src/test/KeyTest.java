@@ -1,10 +1,10 @@
 package test;
 
-import sosutu.Sosuent;
-import sosutu.Sosutu;
-import sosutu.World;
+import sosu.Bu;
+import sosu.Sosu;
+import sosu.World;
 
-public class KeyTest extends Sosuent{
+public class KeyTest extends Bu{
 
 	private static String[][] bindings = {{"RETURN", "enterPressed"},
 										  {"SPACE", "spacePressed"},
@@ -43,15 +43,15 @@ public class KeyTest extends Sosuent{
 	}
 
 	public static void main(String [] argv){
-		Sosutu sosutu = Sosutu.get();
-		sosutu.init();
+		Sosu sosu = Sosu.get();
+		sosu.init();
 		World testworld = new World();
-		sosutu.setWorld(testworld);
+		sosu.loadWorld(testworld);
 		for (String[] binding:bindings){
-			testworld.addBinding(binding[0], binding[1]);
+			testworld.bindInput(binding[0], binding[1]);
 		}
 		KeyTest test = new KeyTest();
-		sosutu.loop();
+		sosu.start();
 		
 	}
 }

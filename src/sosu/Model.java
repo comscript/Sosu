@@ -1,4 +1,4 @@
-package sosutu;
+package sosu;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -18,7 +18,7 @@ import org.lwjgl.util.vector.Vector3f;
 /**
  * Under construction!
  */
-public class Model implements Renderable{
+public class Model{
 	
 	private int id_vao;
 	private int id_vbo;
@@ -182,7 +182,6 @@ public class Model implements Renderable{
 		public int [] getNormals(){
 			return n;
 		}
-		
 	}
 	
 }

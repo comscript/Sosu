@@ -1,11 +1,14 @@
 package sosu;
 
+import java.io.IOException;
+
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.ContextAttribs;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.PixelFormat;
 
 /**
@@ -23,6 +26,9 @@ public class Sosu {
 	//Loaded objects:
 	private World world = null;
 	
+	//Test stuff:
+	private Model model = new Model();
+	
 	private Sosu(){
 	}
 	
@@ -37,8 +43,9 @@ public class Sosu {
 	/**
 	 * Initialize OpenGL, the display, and input devices. This will cause a window
 	 * to pop up, so be sure to render a splash image if you plan to spend a while loading.
+	 * @throws IOException 
 	 */
-	public void init(){
+	public void init() throws IOException{
 		try {
 			//Set up the display for OpenGL 3.2
 			PixelFormat pixelFormat = new PixelFormat();
@@ -50,6 +57,11 @@ public class Sosu {
 			//Set up input devices.
 			Mouse.create();
 			Keyboard.create();
+			//Set up the viewport
+			GL11.glClearColor(0.4f, 0.6f, 0.9f, 0f);
+			GL11.glEnable(GL11.GL_DEPTH_TEST);
+			GL11.glViewport(0,0,800,600);
+			model.loadFromObj("models/crate.obj");
 			//Sosu should now be running.
 			running = true;
 		} catch (LWJGLException e) {
@@ -101,12 +113,16 @@ public class Sosu {
 			return;
 		}
 		running = true;
+		model.construct();
 		while(!isQuitting()){
+			GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 			world.broadcastInput();
 			world.update();
 			world.render();
+			model.render();
 			Display.update();
 		}
+		model.delete();
 		Keyboard.destroy();
 		Mouse.destroy();
 		Display.destroy();

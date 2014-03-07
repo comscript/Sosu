@@ -26,17 +26,17 @@ public class Model{
 	private LinkedList<float[]> textures = new LinkedList<>();
 	private LinkedList<Face> faces = new LinkedList<>();
 	
-	public Model(String filename){
+	public Model(){
 
 	}
 	
-	private void loadFromObj(String filename) throws IOException{
+	public void loadFromObj(String filename) throws IOException{
 		BufferedReader r = new BufferedReader(new FileReader(filename));
 		String line = null;
 		while(null != (line = r.readLine())){
 			line = line.trim();
 			
-			if(line.charAt(0) == '#'){
+			if(line.length() > 0 && line.charAt(0) == '#'){
 				continue;
 			}
 			else{
@@ -99,6 +99,8 @@ public class Model{
 	}
 	
 	public void render() {
+		System.out.print("Triangles: ");
+		System.out.println(faces.size());
 		GL30.glBindVertexArray(id_vao);
 		GL20.glEnableVertexAttribArray(0);
 		

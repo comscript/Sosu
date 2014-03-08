@@ -1,5 +1,7 @@
 package test;
 
+import java.io.IOException;
+
 import sosu.Bu;
 import sosu.Sosu;
 import sosu.World;
@@ -42,7 +44,7 @@ public class KeyTest extends Bu{
 			System.out.println("E was released");
 	}
 
-	public static void main(String [] argv){
+	public static void main(String [] argv) throws IOException{
 		Sosu sosu = Sosu.get();
 		sosu.init();
 		World testworld = new World();

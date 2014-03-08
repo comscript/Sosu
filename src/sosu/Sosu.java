@@ -10,6 +10,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.PixelFormat;
+import org.lwjgl.util.glu.GLU;
 
 /**
  * Sosu is the core of the soon-to-be wildly popular 
@@ -60,6 +61,7 @@ public class Sosu {
 			//Set up the viewport
 			GL11.glClearColor(0.4f, 0.6f, 0.9f, 0f);
 			GL11.glEnable(GL11.GL_DEPTH_TEST);
+			GL11.glDepthFunc(GL11.GL_LESS);
 			GL11.glViewport(0,0,800,600);
 			model.loadFromObj("models/crate.obj");
 			//Sosu should now be running.
@@ -121,12 +123,23 @@ public class Sosu {
 			world.render();
 			model.render();
 			Display.update();
+			exitOnGLError();
 		}
 		model.delete();
 		Keyboard.destroy();
 		Mouse.destroy();
 		Display.destroy();
 		
+	}
+	
+	public void exitOnGLError(){
+		int errorValue = GL11.glGetError();
+		
+		if (errorValue != GL11.GL_NO_ERROR){
+			String errorString = GLU.gluErrorString(errorValue);
+			System.err.println("GL ERROR: "+errorString);
+			quit();
+		}
 	}
 	
 
